@@ -17,9 +17,14 @@ ATPCharacter::ATPCharacter()
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
-	// set our turn rates for input
-	BaseTurnRate = 45.f;
-	BaseLookUpRate = 45.f;
+	// Only rotate camera
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	// Rotate mesh toward input direction at rotation rate
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -31,6 +36,11 @@ ATPCharacter::ATPCharacter()
 	// Create a third person camera
 	TPCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	TPCamera->SetupAttachment(CameraBoom);
+
+	// Set variable default values
+	BaseTurnRate = 45.f;
+	BaseLookUpRate = 45.f;
+	bIsCrouching = false;
 }
 
 void ATPCharacter::BeginPlay()
@@ -49,6 +59,9 @@ void ATPCharacter::SetupPlayerInputComponent(class UInputComponent * PlayerInput
 	PlayerInputComponent->BindAxis("TurnRate", this, &ATPCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &ATPCharacter::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ATPCharacter::LookUpAtRate);
+
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ATPCharacter::Jump);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ATPCharacter::ToggleCrouch);
 }
 
 void ATPCharacter::MoveForward(float Value)
@@ -88,5 +101,10 @@ void ATPCharacter::LookUpAtRate(float Value)
 void ATPCharacter::TurnAtRate(float Value)
 {
 	AddControllerYawInput(Value * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+}
+
+void ATPCharacter::ToggleCrouch()
+{
+	bIsCrouching == false ? bIsCrouching = true : bIsCrouching = false;
 }
 

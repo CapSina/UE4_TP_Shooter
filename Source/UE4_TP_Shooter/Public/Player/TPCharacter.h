@@ -14,6 +14,12 @@ class UE4_TP_SHOOTER_API ATPCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+protected:
+	/** Is crouching */
+	UPROPERTY(BlueprintReadOnly, Category = "Input")
+	bool bIsCrouching;
+
+
 private:
 	////////////////////////////////////////////////////////////////////////////////
 	// Camera setup
@@ -70,5 +76,8 @@ private:
 
 	/** Change characters view Yaw */
 	void TurnAtRate(float Value);
+
+	/** Crouch and UnCrouch */
+	void ToggleCrouch();
 
 };
